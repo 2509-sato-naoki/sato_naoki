@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="header-contents">
+    <h1>TODOリスト</h1>
+</div>
+
+<div class="main-contents">
+    <!-- 不正なパラメータです（エラーメッセージ）-->
+    <div class="">
+    </div>
+
+    <!-- 本日の日付-->
+    <div class="">
+    </div>
+
+    <!-- 新規タスク（タスク追加画面に遷移）-->
+    <a>タスク追加</a>
+
+    <!-- 絞り込み（）-->
+
+    <!-- タスク内容など-->
+    <table>
+        <thead>
+            <tr>
+                <th>タスク内容</th>
+                <th>ステータス</th>
+                <th>タスク期限</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="content : ${contents}">
+                <th th:text="${content.content}"></th>
+                <th>
+                    <form method="" action="">
+                        <select name="example">
+                            <option th:value="未着手" th:selected="${content.status == 1}">未着手</option>
+                            <option th:value="実行中" th:selected="${content.status == 2}">実行中</option>
+                            <option th:value="ステイ中" th:selected="${content.status == 3}">ステイ中</option>
+                            <option th:value="完了" th:selected="${content.status == 4}">完了</option>
+                        </select>
+                        <input type="submit" value="変更">
+                    </form>
+                </th>
+                    <th th:text="${#dates.format(content.limitedDate, 'yyyy-MM-dd')}"></th>
+                <th>
+                    <form method="" action="">
+                        <input type="submit" value="編集">
+                    </form>
+                </th>
+                <th>
+                    <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
+                        <input type="submit" value="削除">
+                    </form>
+                </th>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+</div>
+
+</body>
+</html>
