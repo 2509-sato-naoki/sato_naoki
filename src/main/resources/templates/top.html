@@ -10,18 +10,54 @@
 </div>
 
 <div class="main-contents">
-    <!-- 不正なパラメータです（エラーメッセージ）-->
-    <div class="">
+    <!-- エラーメッセージ-->
+    <div th:if="${errorMessages != null}" class="error-messages">
+        <ul>
+            <li th:text="${errorMessages}"></li>
+        </ul>
     </div>
 
     <!-- 本日の日付-->
-    <div class="">
+    <div id="current_date">
+        <script>
+            date = new Date();
+            year = date.getFullYear();
+            month = date.getMonth() + 1;
+            day = date.getDate();
+            document.getElementById("current_date").innerHTML = month + "/" + day + "/" + year;
+        </script>
     </div>
 
     <!-- 新規タスク（タスク追加画面に遷移）-->
-    <a>タスク追加</a>
+    <a href="addTask">タスク追加</a>
 
     <!-- 絞り込み（）-->
+    <form action="./" method="get">
+        <div class="narrow-contents">
+            <div class="date">
+                日付：
+                <input type="date" id="start" name="startDate" value="">
+                ～
+                <input type="date" id="end" name="endDate" value="">
+            </div>
+
+            <div class="status">
+                <select name="status">
+                    <option value="">選択する</option>>
+                    <option value="1">未着手</option>
+                    <option value="2">実行中</option>
+                    <option value="3">ステイ中</option>
+                    <option value="4">完了</option>
+                </select>
+            </div>
+
+            <div class="word">
+                <input type="text" name="task">
+            </div>
+        </div>
+
+        <input type="submit" value="絞り込み">
+    </form>
 
     <!-- タスク内容など-->
     <table>
@@ -38,20 +74,23 @@
             <tr th:each="content : ${contents}">
                 <th th:text="${content.content}"></th>
                 <th>
-                    <form method="" action="">
-                        <select name="example">
-                            <option th:value="未着手" th:selected="${content.status == 1}">未着手</option>
-                            <option th:value="実行中" th:selected="${content.status == 2}">実行中</option>
-                            <option th:value="ステイ中" th:selected="${content.status == 3}">ステイ中</option>
-                            <option th:value="完了" th:selected="${content.status == 4}">完了</option>
+                    <form method="post" th:action="@{/statusEdit/{id}(id=${content.id})}">
+                        <select name="status">
+                            <option th:value="1" th:selected="${content.status == 1}">未着手</option>
+                            <option th:value="2" th:selected="${content.status == 2}">実行中</option>
+                            <option th:value="3" th:selected="${content.status == 3}">ステイ中</option>
+                            <option th:value="4" th:selected="${content.status == 4}">完了</option>
                         </select>
                         <input type="submit" value="変更">
                     </form>
                 </th>
-                    <th th:text="${#dates.format(content.limitedDate, 'yyyy-MM-dd')}"></th>
+                <!-- <th th:text="${content.limitedDate}"></th>-->
+                <th th:text="${#temporals.format(content.limitedDate, 'yyyy-MM-dd')}"></th>
+
                 <th>
-                    <form method="" action="">
+                    <form method="get" action="/edit">
                         <input type="submit" value="編集">
+                        <input name="id" type="hidden" th:value="${content.id}">
                     </form>
                 </th>
                 <th>
