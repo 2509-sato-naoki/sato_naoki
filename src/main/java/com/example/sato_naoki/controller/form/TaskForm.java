@@ -1,4 +1,5 @@
 package com.example.sato_naoki.controller.form;
+import jakarta.validation.constraints.FutureOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ public class TaskForm {
     private int status;
 
     @NotNull
+    @FutureOrPresent
     private LocalDate limitedDate;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;

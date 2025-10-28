@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
     <title>Title</title>
 </head>
 <body>
@@ -35,24 +36,24 @@
     <form action="./" method="get">
         <div class="narrow-contents">
             <div class="date">
-                日付：
-                <input type="date" id="start" name="startDate" value="">
+                期限：
+                <input type="date" id="start" name="startDate" th:value="${startDate}">
                 ～
-                <input type="date" id="end" name="endDate" value="">
+                <input type="date" id="end" name="endDate" th:value="${endDate}">
             </div>
 
             <div class="status">
                 <select name="status">
-                    <option value="">選択する</option>>
-                    <option value="1">未着手</option>
-                    <option value="2">実行中</option>
-                    <option value="3">ステイ中</option>
-                    <option value="4">完了</option>
+                    <option value="" th:selected="${status == null}">選択する</option>
+                    <option value="1" th:selected="${status == 1}">未着手</option>
+                    <option value="2" th:selected="${status == 2}">実行中</option>
+                    <option value="3" th:selected="${status == 3}">ステイ中</option>
+                    <option value="4" th:selected="${status == 4}">完了</option>
                 </select>
             </div>
 
             <div class="word">
-                <input type="text" name="task">
+                <input type="text" name="task" th:value="${text}">
             </div>
         </div>
 
@@ -74,7 +75,8 @@
             <tr th:each="content : ${contents}">
                 <th th:text="${content.content}"></th>
                 <th>
-                    <form method="post" th:action="@{/statusEdit/{id}(id=${content.id})}">
+                    <form method="post" th:action="@{/statusEdit/{id}(id=${content.id})}"
+                          onsubmit="return confirm('ステータスを変更してよろしいですか？');">
                         <select name="status">
                             <option th:value="1" th:selected="${content.status == 1}">未着手</option>
                             <option th:value="2" th:selected="${content.status == 2}">実行中</option>
@@ -85,7 +87,8 @@
                     </form>
                 </th>
                 <!-- <th th:text="${content.limitedDate}"></th>-->
-                <th th:text="${#temporals.format(content.limitedDate, 'yyyy-MM-dd')}"></th>
+                <th th:text="${#temporals.format(content.limitedDate, 'yyyy-MM-dd')}"
+                    th:classappend="${content.limitedDate.isBefore(T(java.time.LocalDate).now())} ? 'past' : 'future'"></th>
 
                 <th>
                     <form method="get" action="/edit">
@@ -94,7 +97,8 @@
                     </form>
                 </th>
                 <th>
-                    <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
+                    <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete"
+                          onsubmit="return confirm('削除してよろしいですか？');">
                         <input type="submit" value="削除">
                     </form>
                 </th>

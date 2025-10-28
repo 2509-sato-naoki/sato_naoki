@@ -31,25 +31,33 @@ public class TaskService {
         }
         List<TaskForm> taskForms = new ArrayList<>();
         //taskやstatusがnullの場合を考える　最初の起動時はtaskはnullになる
-        if (task == null && status == null) {
-            List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
-            taskForms = setAllTaskForm(tasks);
-        } else if (task == null && status != null) {
-            List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
-            taskForms = setAllTaskForm(tasks);
-        } else if(status == null){
-            List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
-            taskForms = setAllTaskForm(tasks);
-        }else if (!task.isBlank() && status == null) {
-            List<Task> tasks = taskrepository.findByLimitedDateBetweenAndContentOrderByLimitedDateAsc(startDateTime, endDateTime, task);
-            taskForms = setAllTaskForm(tasks);
-        } else if (task.isBlank() && status != null) {
-            List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
-            taskForms = setAllTaskForm(tasks);
+
+        //タスクがnullの場合
+        if (task == null) {
+            if (status == null) {
+                List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
+                taskForms = setAllTaskForm(tasks);
+            } else {
+                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
+                taskForms = setAllTaskForm(tasks);
+            }
         } else {
-            List<Task> tasks = taskrepository.findBylimitedDateBetweenAndContentAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, task, status);
-            taskForms = setAllTaskForm(tasks);
+            //タスクがnullではない場合（isblankも判断する）
+            if (task.isBlank() && status == null) {
+                List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
+                taskForms = setAllTaskForm(tasks);
+            } else if (!task.isBlank() && status != null) {
+                List<Task> tasks = taskrepository.findBylimitedDateBetweenAndContentAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, task, status);
+                taskForms = setAllTaskForm(tasks);
+            } else if (task.isBlank() && status != null) {
+                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
+                taskForms = setAllTaskForm(tasks);
+            } else if (!task.isBlank() && status == null) {
+                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndContentOrderByLimitedDateAsc(startDateTime, endDateTime, task);
+                taskForms = setAllTaskForm(tasks);
+            }
         }
+
         return taskForms;
     }
 
@@ -99,6 +107,19 @@ public class TaskService {
         taskrepository.save(task);
     }
 
+    //既存のsaveTaskメソッドではタスク編集ができなかったので別にメソッドを作成　setIdの処理
+    public void saveTaskEdit(TaskForm taskForm) {
+        Task task = new Task();
+        task.setId(taskForm.getId());
+        task.setContent(taskForm.getContent());
+        task.setStatus(taskForm.getStatus());
+        task.setLimitedDate(taskForm.getLimitedDate().atStartOfDay());
+        task.setCreatedDate(taskForm.getCreatedDate());
+        task.setUpdatedDate(LocalDateTime.now());
+        taskrepository.save(task);
+    }
+
+
     public TaskForm findTaskForm(Integer id) {
         Task task = findTask(id);
         TaskForm taskForm = new TaskForm();
@@ -107,6 +128,7 @@ public class TaskService {
         taskForm.setStatus(task.getStatus());
         taskForm.setCreatedDate(task.getCreatedDate());
         taskForm.setUpdatedDate(task.getUpdatedDate());
+        taskForm.setStatus(task.getStatus());
         LocalDate localDate = task.getLimitedDate().toLocalDate();
         taskForm.setLimitedDate(localDate);
         return taskForm;

@@ -9,6 +9,33 @@
     <h1>タスク編集</h1>
 </div>
 
+<!-- エラーメッセージ-->
+<div th:if="${errorMessages != null and !errorMessages.isEmpty()}" class="error-messages">
+    <ul>
+        <li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
+    </ul>
+</div>
+
+<form action="/editTask" method="post" th:object="${formModel}">
+    <!--    <p th:if="${#fields.hasErrors('content')}"-->
+    <!--       th:errors="*{content}"-->
+    <!--       style="color:red"></p>-->
+    <div>
+        <label>タスク内容</label>
+        <textarea th:field="*{content}"></textarea>
+    </div>
+
+    <div>
+        <label>タスク期限</label>
+        <textarea th:field="*{limitedDate}"></textarea>
+    </div>
+    <input type="hidden" name="id" th:value="${formModel.id}">
+    <input type="hidden" name="createdDate" th:value="${formModel.createdDate}">
+    <input type="hidden" name="updatedDate" th:value="${formModel.updatedDate}">
+    <input type="hidden" name="status" th:value="${formModel.status}">
+    <input type="submit" value="追加">
+</form>
+<a href="/">戻る</a>
 
 </body>
 </html>

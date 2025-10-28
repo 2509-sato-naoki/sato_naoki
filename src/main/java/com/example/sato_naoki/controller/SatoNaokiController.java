@@ -30,6 +30,10 @@ public class SatoNaokiController {
         ModelAndView mav = new ModelAndView();
         List<TaskForm> contentData = taskService.findAllTask(task, status, startDate, endDate);
         mav.setViewName("/top");
+        mav.addObject("startDate", startDate);
+        mav.addObject("endDate", endDate);
+        mav.addObject("text", task);
+        mav.addObject("status", status);
         mav.addObject("contents", contentData);
         return mav;
     }
@@ -94,18 +98,35 @@ public class SatoNaokiController {
     public ModelAndView editContent(RedirectAttributes redirectAttributes,
                                     HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
-        int id = Integer.parseInt(request.getParameter("id"));
         //idチェック
         if (request.getParameter("id") != null && request.getParameter("id").matches("^[0-9]+$")) {
+            int id = Integer.parseInt(request.getParameter("id"));
             TaskForm taskForm = taskService.findTaskForm(id);
             mav.addObject("formModel", taskForm);
             mav.setViewName("/edit");
             return mav;
         } else {
-            redirectAttributes.addFlashAttribute("errorMessages", "投稿内容を入力してください");
+            redirectAttributes.addFlashAttribute("errorMessages", "不正なパラメータです");
             return new ModelAndView("redirect:/");
         }
+    }
 
+    //編集処理
+    @PostMapping("/editTask")
+    public ModelAndView editTaskContent(@ModelAttribute @Validated TaskForm taskForm
+    , BindingResult result) {
+        if (result.hasErrors()) {
+            //この中に
+            List<String> errorMessages = new ArrayList<>();
+            errorMessages(taskForm, errorMessages);
+            ModelAndView mav = new ModelAndView();
+            mav.addObject("errorMessages", errorMessages);
+            mav.setViewName("/edit");
+            return mav;
+        } else {
+            taskService.saveTaskEdit(taskForm);
+            return new ModelAndView("redirect:/");
+        }
     }
 
 }
