@@ -30,7 +30,7 @@
     </div>
 
     <!-- 新規タスク（タスク追加画面に遷移）-->
-    <a href="addTask">タスク追加</a>
+    <button type=“button” onclick="location.href='addTask'">新規タスク</button>
 
     <!-- 絞り込み（）-->
     <form action="./" method="get">
@@ -86,8 +86,8 @@
                         <input type="submit" value="変更">
                     </form>
                 </th>
-                <!-- <th th:text="${content.limitedDate}"></th>-->
-                <th th:text="${#temporals.format(content.limitedDate, 'yyyy-MM-dd')}"
+<!--                 <th th:text="${content.limitedDate}"></th>-->
+                <th th:text="${#temporals.format(content.limitedDate, 'yyyy/MM/dd')}"
                     th:classappend="${content.limitedDate.isBefore(T(java.time.LocalDate).now())} ? 'past' : 'future'"></th>
 
                 <th>

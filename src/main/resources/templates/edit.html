@@ -27,7 +27,8 @@
 
     <div>
         <label>タスク期限</label>
-        <textarea th:field="*{limitedDate}"></textarea>
+<!--        <textarea th:field="*{limitedDate}"></textarea>-->
+        <input type="date" th:field="*{limitedDate}">
     </div>
     <input type="hidden" name="id" th:value="${formModel.id}">
     <input type="hidden" name="createdDate" th:value="${formModel.createdDate}">

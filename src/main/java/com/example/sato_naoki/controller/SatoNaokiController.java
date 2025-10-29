@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,26 +53,30 @@ public class SatoNaokiController {
     }
 
     @GetMapping("/addTask")
-    public ModelAndView addTaskContent() {
+    public ModelAndView addTaskContent(@ModelAttribute("formModel") TaskForm taskForm) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/addTask");
-        TaskForm taskForm = new TaskForm();
+//        TaskForm taskForm = new TaskForm();
         mav.addObject("formModel", taskForm);
         return mav;
     }
 
     @PostMapping("/addTask")
     public ModelAndView addTaskProcessContent(@ModelAttribute("formModel") @Validated TaskForm taskForm,
-                                              BindingResult result) {
+                                              BindingResult result, RedirectAttributes redirectAttributes) {
+        List<String> errorMessages = new ArrayList<>();
         if (result.hasErrors()) {
             //この中に
-            List<String> errorMessages = new ArrayList<>();
-            errorMessages(taskForm, errorMessages);
-            ModelAndView mav = new ModelAndView();
-            mav.addObject("errorMessages", errorMessages);
-            mav.addObject("formModel", taskForm);
-            mav.setViewName("/addTask");
-            return mav;
+            for (FieldError error : result.getFieldErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+        }
+        //エラーメッセージの判定
+        if (errorMessages.size() >= 1) {
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            redirectAttributes.addFlashAttribute("formModel", taskForm);
+            // errorMessagesにresultの中身を格納する
+            return new ModelAndView("redirect:/addTask");
         } else {
             taskForm.setStatus(1);
             taskForm.setUpdatedDate(LocalDateTime.now());
@@ -80,19 +86,19 @@ public class SatoNaokiController {
         }
     }
 
-    private void errorMessages(TaskForm taskForm, List<String> errorMessages) {
-        if (taskForm.getContent().isBlank()) {
-            errorMessages.add("タスクを入力してください");
-        } else if (taskForm.getContent().length() > 140) {
-            errorMessages.add("タスクは140文字以内で入力してください");
-        }
-
-        if (taskForm.getLimitedDate() == null) {
-            errorMessages.add("期限を設定してください");
-        } else if (taskForm.getLimitedDate().isBefore(LocalDate.now())) {
-            errorMessages.add("無効な日付です");
-        }
-    }
+//    private void errorMessages(TaskForm taskForm, List<String> errorMessages) {
+//        if (taskForm.getContent().isBlank()) {
+//            errorMessages.add("タスクを入力してください");
+//        } else if (taskForm.getContent().length() > 140) {
+//            errorMessages.add("タスクは140文字以内で入力してください");
+//        }
+//
+//        if (taskForm.getLimitedDate() == null) {
+//            errorMessages.add("期限を設定してください");
+//        } else if (taskForm.getLimitedDate().isBefore(LocalDate.now())) {
+//            errorMessages.add("無効な日付です");
+//        }
+//    }
 
     //編集画面表示
     @GetMapping("/edit")
@@ -115,20 +121,24 @@ public class SatoNaokiController {
     //編集処理
     @PostMapping("/editTask")
     public ModelAndView editTaskContent(@ModelAttribute("formModel") @Validated TaskForm taskForm
-    , BindingResult result) {
-//        正規表現をここで行う
+    , BindingResult result, RedirectAttributes redirectAttributes) {
+        //正規表現をここで行う
+        List<String> errorMessages = new ArrayList<>();
+
         if (result.hasErrors()) {
-            //この中に
-            List<String> errorMessages = new ArrayList<>();
-            errorMessages(taskForm, errorMessages);
-            ModelAndView mav = new ModelAndView();
-            mav.addObject("errorMessages", errorMessages);
-            mav.setViewName("/edit");
-            return mav;
+            for (FieldError error : result.getFieldErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+        }
+        if (errorMessages.size() >= 1) {
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            redirectAttributes.addFlashAttribute("formModel", taskForm);
+            return new ModelAndView("redirect:/edit?id=" + taskForm.getId());
         } else {
             taskService.saveTaskEdit(taskForm);
             return new ModelAndView("redirect:/");
         }
+
     }
 
 }
