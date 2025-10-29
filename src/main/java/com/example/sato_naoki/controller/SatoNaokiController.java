@@ -68,6 +68,7 @@ public class SatoNaokiController {
             errorMessages(taskForm, errorMessages);
             ModelAndView mav = new ModelAndView();
             mav.addObject("errorMessages", errorMessages);
+            mav.addObject("formModel", taskForm);
             mav.setViewName("/addTask");
             return mav;
         } else {
@@ -113,8 +114,9 @@ public class SatoNaokiController {
 
     //編集処理
     @PostMapping("/editTask")
-    public ModelAndView editTaskContent(@ModelAttribute @Validated TaskForm taskForm
+    public ModelAndView editTaskContent(@ModelAttribute("formModel") @Validated TaskForm taskForm
     , BindingResult result) {
+//        正規表現をここで行う
         if (result.hasErrors()) {
             //この中に
             List<String> errorMessages = new ArrayList<>();
