@@ -132,7 +132,8 @@ public class SatoNaokiController {
         }
         if (errorMessages.size() >= 1) {
             redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
-            redirectAttributes.addFlashAttribute("formModel", taskForm);
+            redirectAttributes.addFlashAttribute("content", taskForm.getContent());
+            redirectAttributes.addFlashAttribute("limitedDate", taskForm.getLimitedDate());
             return new ModelAndView("redirect:/edit?id=" + taskForm.getId());
         } else {
             taskService.saveTaskEdit(taskForm);

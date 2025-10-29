@@ -3,13 +3,14 @@ package com.example.sato_naoki.repository;
 import com.example.sato_naoki.repository.entity.Task;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Integer>{
+public interface TaskRepository extends JpaRepository<Task, Integer>, JpaSpecificationExecutor<Task> {
     List<Task> findBylimitedDateBetweenAndContentAndStatusOrderByLimitedDateAsc(
             LocalDateTime startDateTime,
             LocalDateTime endDateTime,

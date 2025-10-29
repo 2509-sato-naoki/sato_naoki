@@ -33,30 +33,39 @@ public class TaskService {
         //taskやstatusがnullの場合を考える　最初の起動時はtaskはnullになる
 
         //タスクがnullの場合
-        if (task == null) {
-            if (status == null) {
-                List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
-                taskForms = setAllTaskForm(tasks);
-            } else {
-                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
-                taskForms = setAllTaskForm(tasks);
-            }
-        } else {
-            //タスクがnullではない場合（isblankも判断する）
-            if (task.isBlank() && status == null) {
-                List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
-                taskForms = setAllTaskForm(tasks);
-            } else if (!task.isBlank() && status != null) {
-                List<Task> tasks = taskrepository.findBylimitedDateBetweenAndContentAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, task, status);
-                taskForms = setAllTaskForm(tasks);
-            } else if (task.isBlank() && status != null) {
-                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
-                taskForms = setAllTaskForm(tasks);
-            } else if (!task.isBlank() && status == null) {
-                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndContentOrderByLimitedDateAsc(startDateTime, endDateTime, task);
-                taskForms = setAllTaskForm(tasks);
-            }
-        }
+        //if分のネストが多い
+        //if分の条件がおかしい
+        //これ以外にもやり方はある
+        //①specificationというクラスを使う方法がある←可能であればこっちをやってみる　SB推奨
+        //動的な条件がある場合、specificationは便利なクラスとして用意されてるもの
+        //②@Queryを使って従来のsqlを使う
+        //上記の調べ方 springboot springJPA 条件　動的
+        //検索の仕方　漠然ではなく、具体的に調べる　検索のキーワード、文言
+//
+//        if (task == null) {
+//            if (status == null) {
+//                List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
+//                taskForms = setAllTaskForm(tasks);
+//            } else {
+//                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
+//                taskForms = setAllTaskForm(tasks);
+//            }
+//        } else {
+//            //タスクがnullではない場合（isblankも判断する）
+//            if (task.isBlank() && status == null) {
+//                List<Task> tasks = taskrepository.findByLimitedDateBetweenOrderByLimitedDateAsc(startDateTime, endDateTime);
+//                taskForms = setAllTaskForm(tasks);
+//            } else if (!task.isBlank() && status != null) {
+//                List<Task> tasks = taskrepository.findBylimitedDateBetweenAndContentAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, task, status);
+//                taskForms = setAllTaskForm(tasks);
+//            } else if (task.isBlank() && status != null) {
+//                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndStatusOrderByLimitedDateAsc(startDateTime, endDateTime, status);
+//                taskForms = setAllTaskForm(tasks);
+//            } else if (!task.isBlank() && status == null) {
+//                List<Task> tasks = taskrepository.findByLimitedDateBetweenAndContentOrderByLimitedDateAsc(startDateTime, endDateTime, task);
+//                taskForms = setAllTaskForm(tasks);
+//            }
+//        }
 
         return taskForms;
     }
